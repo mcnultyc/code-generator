@@ -1,0 +1,311 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Task :dependencies
+
+------------------------------------------------------------
+Root project
+------------------------------------------------------------
+
+annotationProcessor - Annotation processors and their dependencies for source set 'main'.
+No dependencies
+
+apiElements - API elements for main. (n)
+No dependencies
+
+archives - Configuration for archive artifacts.
+No dependencies
+
+compile - Dependencies for source set 'main' (deprecated, use 'implementation' instead).
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
+\--- org.json:json:20190722
+
+compileClasspath - Compile classpath for source set 'main'.
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
++--- org.json:json:20190722
+\--- com.jetbrains:ideaIC:2019.2.3
+
+compileOnly - Compile only dependencies for source set 'main'.
+\--- com.jetbrains:ideaIC:2019.2.3
+
+default - Configuration for default artifacts.
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
+\--- org.json:json:20190722
+
+idea
+\--- com.jetbrains:ideaIC:2019.2.3
+
+ideaPlugins
+No dependencies
+
+implementation - Implementation only dependencies for source set 'main'. (n)
+No dependencies
+
+runtime - Runtime dependencies for source set 'main' (deprecated, use 'runtimeOnly' instead).
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
+\--- org.json:json:20190722
+
+runtimeClasspath - Runtime classpath of source set 'main'.
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
+\--- org.json:json:20190722
+
+runtimeElements - Elements of runtime for main. (n)
+No dependencies
+
+runtimeOnly - Runtime only dependencies for source set 'main'. (n)
+No dependencies
+
+testAnnotationProcessor - Annotation processors and their dependencies for source set 'test'.
+No dependencies
+
+testCompile - Dependencies for source set 'test' (deprecated, use 'testImplementation' instead).
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
++--- org.json:json:20190722
+\--- com.jetbrains:ideaIC:2019.2.3
+
+testCompileClasspath - Compile classpath for source set 'test'.
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
++--- org.json:json:20190722
++--- com.jetbrains:ideaIC:2019.2.3
+\--- org.junit.jupiter:junit-jupiter-api:5.3.1
+     +--- org.apiguardian:apiguardian-api:1.0.0
+     +--- org.opentest4j:opentest4j:1.1.1
+     \--- org.junit.platform:junit-platform-commons:1.3.1
+          \--- org.apiguardian:apiguardian-api:1.0.0
+
+testCompileOnly - Compile only dependencies for source set 'test'.
+No dependencies
+
+testImplementation - Implementation only dependencies for source set 'test'. (n)
+\--- org.junit.jupiter:junit-jupiter-api:5.3.1 (n)
+
+testRuntime - Runtime dependencies for source set 'test' (deprecated, use 'testRuntimeOnly' instead).
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
++--- org.json:json:20190722
+\--- com.jetbrains:ideaIC:2019.2.3
+
+testRuntimeClasspath - Runtime classpath of source set 'test'.
++--- org.slf4j:slf4j-api:1.7.28
++--- ch.qos.logback:logback-classic:1.2.3
+|    +--- ch.qos.logback:logback-core:1.2.3
+|    \--- org.slf4j:slf4j-api:1.7.25 -> 1.7.28
++--- ch.qos.logback:logback-core:1.2.3
++--- com.typesafe:config:1.3.4
++--- com.github.javaparser:javaparser-core:3.15.12
++--- com.github.javaparser:javaparser-symbol-solver-core:3.15.12
+|    +--- com.github.javaparser:javaparser-symbol-solver-logic:3.15.12
+|    |    \--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12
+|    |         +--- com.github.javaparser:javaparser-core:3.15.12
+|    |         +--- org.javassist:javassist:3.24.0-GA
+|    |         \--- com.google.guava:guava:27.0-jre
+|    |              +--- com.google.guava:failureaccess:1.0
+|    |              +--- com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+|    |              +--- com.google.code.findbugs:jsr305:3.0.2
+|    |              +--- org.checkerframework:checker-qual:2.5.2
+|    |              +--- com.google.errorprone:error_prone_annotations:2.2.0
+|    |              +--- com.google.j2objc:j2objc-annotations:1.1
+|    |              \--- org.codehaus.mojo:animal-sniffer-annotations:1.17
+|    +--- org.javassist:javassist:3.24.0-GA
+|    +--- com.github.javaparser:javaparser-symbol-solver-model:3.15.12 (*)
+|    \--- com.google.guava:guava:27.0-jre (*)
++--- org.json:json:20190722
++--- com.jetbrains:ideaIC:2019.2.3
++--- org.junit.jupiter:junit-jupiter-api:5.3.1
+|    +--- org.apiguardian:apiguardian-api:1.0.0
+|    +--- org.opentest4j:opentest4j:1.1.1
+|    \--- org.junit.platform:junit-platform-commons:1.3.1
+|         \--- org.apiguardian:apiguardian-api:1.0.0
+\--- org.junit.jupiter:junit-jupiter-engine:5.3.1
+     +--- org.apiguardian:apiguardian-api:1.0.0
+     +--- org.junit.platform:junit-platform-engine:1.3.1
+     |    +--- org.apiguardian:apiguardian-api:1.0.0
+     |    +--- org.junit.platform:junit-platform-commons:1.3.1 (*)
+     |    \--- org.opentest4j:opentest4j:1.1.1
+     \--- org.junit.jupiter:junit-jupiter-api:5.3.1 (*)
+
+testRuntimeOnly - Runtime only dependencies for source set 'test'. (n)
+\--- org.junit.jupiter:junit-jupiter-engine:5.3.1 (n)
+
+(*) - dependencies omitted (listed previously)
+
+(n) - Not resolved (configuration is not meant to be resolved)
+
+A web-based, searchable dependency report is available by adding the --scan option.
+
+BUILD SUCCESSFUL in 6s
+1 actionable task: 1 executed

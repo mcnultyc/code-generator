@@ -5,6 +5,11 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -12,12 +17,18 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class GeneratorToolWindow implements ActionListener {
 
 
     private JPanel contentPane;
-    private JComboBox comboBox1;
+    private JComboBox patternComboBox;
 
     private JTextField classTextField1;
     private JTextField classTextField4;
@@ -27,15 +38,12 @@ public class GeneratorToolWindow implements ActionListener {
     private JList list1;
     private JTable table1;
     private JTable table2;
-    private JButton button1;
-    private JButton button2;
-    private JTextField textField1;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JButton button3;
-    private JTextField packageTextField;
-    private JTextField textField7;
+    private JButton addButton1;
+    private JButton addButton2;
+    private JButton generateButton;
+
+
+    private static Logger logger = LoggerFactory.getLogger(GeneratorToolWindow.class);
 
     public GeneratorToolWindow(ToolWindow toolWindow) {
         $$$setupUI$$$();
@@ -47,13 +55,35 @@ public class GeneratorToolWindow implements ActionListener {
         classTextField3.setForeground(new Color(-9211021));
         classTextField4.setText("ProductA");
         classTextField4.setForeground(new Color(-9211021));
+
+
+        logger.info("CREATING COMPONENT");
+
+
+        try {
+            InputStream inStream = GeneratorToolWindow.class.getResourceAsStream("design-patterns.conf");
+            if (inStream != null) {
+                Reader reader = new InputStreamReader(inStream);
+
+                // Load the configuration file
+                Config config = ConfigFactory.parseReader(reader);
+
+                // Load the destination directory for designs being generated
+                String directory = config.getString("conf.path");
+
+                logger.info("DIRECTORY:"+directory);
+                inStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createUIComponents() {
 
-        String[] patterns = {"Abstract Factory", "Factory Method", "Builder", "Chain of Responsibility"};
-        comboBox1 = new ComboBox(patterns);
-        comboBox1.addActionListener(this);
+        String[] patterns = {"Abstract Factory", "Factory Method", "Builder", "Chain"};
+        patternComboBox = new ComboBox(patterns);
+        patternComboBox.addActionListener(this);
 
         DefaultListModel<String> listModel1 = new DefaultListModel<>();
         listModel1.addElement("hello");
@@ -80,6 +110,8 @@ public class GeneratorToolWindow implements ActionListener {
         tableCellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         table2.getColumn("ProductB").setHeaderRenderer(tableCellRenderer);
 
+
+
         //table2.setVisible(false);
         //table2.setEnabled(false);
 
@@ -93,9 +125,9 @@ public class GeneratorToolWindow implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (comboBox1.getSelectedIndex() != -1) {
-            String pattern = (String) comboBox1.getSelectedItem();
-            System.err.println(pattern);
+        if (patternComboBox.getSelectedIndex() != -1) {
+            String pattern = (String) patternComboBox.getSelectedItem();
+            DesignPatternGenerator generator = new FactoryMethodGenerator("Creator","ConcreteCreator", "Product", new String[]{"Product1"});
         }
     }
 
@@ -113,7 +145,7 @@ public class GeneratorToolWindow implements ActionListener {
         contentPane.setEnabled(true);
         contentPane.setMinimumSize(new Dimension(318, 150));
         contentPane.setPreferredSize(new Dimension(924, 150));
-        contentPane.add(comboBox1, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(150, -1), null, null, 0, false));
+        contentPane.add(patternComboBox, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(150, -1), null, null, 0, false));
         classTextField1.setForeground(new Color(-9211021));
         classTextField1.setName("");
         classTextField1.setText("");
@@ -131,12 +163,12 @@ public class GeneratorToolWindow implements ActionListener {
         contentPane.add(panel1, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel1.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        button1 = new JButton();
-        button1.setText("Button");
-        panel1.add(button1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        button2 = new JButton();
-        button2.setText("Button");
-        panel1.add(button2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addButton1 = new JButton();
+        addButton1.setText("Button");
+        panel1.add(addButton1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addButton2 = new JButton();
+        addButton2.setText("Button");
+        panel1.add(addButton2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane1 = new JScrollPane();
         panel1.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         scrollPane1.setViewportView(table1);

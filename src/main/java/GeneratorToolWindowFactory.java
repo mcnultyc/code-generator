@@ -11,6 +11,9 @@ public class GeneratorToolWindowFactory implements ToolWindowFactory {
         GeneratorToolWindow generatorToolWindow = new GeneratorToolWindow(toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(generatorToolWindow.getContent(), "", false);
+        content.setPreferredFocusableComponent(generatorToolWindow.getContent());
+        System.err.println("h");
         toolWindow.getContentManager().addContent(content);
+
     }
 }

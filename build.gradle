@@ -20,12 +20,12 @@ plugins {
 }
 
 apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
 
 group 'GeneratorPlugin'
 version '1.0'
 
 sourceCompatibility = 1.8
-
 
 repositories {
     mavenCentral()
@@ -48,10 +48,11 @@ dependencies {
 }
 
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.2.3'
+    type 'IC'
 }
+
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>

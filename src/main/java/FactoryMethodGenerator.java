@@ -16,7 +16,8 @@ import com.github.javaparser.ast.stmt.SwitchEntry;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 
 import com.typesafe.config.Config;
-import com.intellij.openapi.diagnostic.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +37,7 @@ public class FactoryMethodGenerator extends DesignPatternGenerator {
     private String      product;
     private String[]    concreteProducts;
 
-    //private Logger logger = LoggerFactory.getLogger(FactoryMethodGenerator.class);
-    private static final Logger logger = Logger.getInstance(FactoryMethodGenerator.class);
+    private Logger logger = LoggerFactory.getLogger(FactoryMethodGenerator.class);
 
     /**
      *

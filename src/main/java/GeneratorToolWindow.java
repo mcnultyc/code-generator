@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class GeneratorToolWindow implements ActionListener {
 
@@ -58,7 +56,12 @@ public class GeneratorToolWindow implements ActionListener {
 
 
         logger.info("CREATING COMPONENT");
+        generateButton.addActionListener(e -> {
+            if(patternComboBox.getSelectedIndex() != -1){
+                String pattern = (String) patternComboBox.getSelectedItem();
 
+            }
+        });
 
         try {
             InputStream inStream = GeneratorToolWindow.class.getResourceAsStream("design-patterns.conf");

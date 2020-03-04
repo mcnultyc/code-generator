@@ -1,0 +1,27 @@
+<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+    <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+    <defs>
+        <linearGradient y2="0.765625" x2="0.699219" y1="0.039063" x1="0.035156" id="svg_17">
+            <stop offset="0.226563" stop-color="#063257"/>
+            <stop offset="1" stop-color="#f9cda8"/>
+        </linearGradient>
+        <linearGradient y2="0.894531" x2="0.898438" y1="0" x1="0" id="svg_18">
+            <stop offset="0.03125" stop-color="#70f3f9"/>
+            <stop offset="0.804688" stop-color="#8f0c06"/>
+            <stop offset="0.949219" stop-color="#70f3f9"/>
+        </linearGradient>
+    </defs>
+    <g>
+        <title>Layer 0</title>
+        <path stroke="#000" id="svg_2"
+              d="m2.507088,20.239878l16.923057,-17.085018l16.923096,17.085018l-16.923096,17.085018l-16.923057,-17.085018z"
+              stroke-width="2" fill="url(#svg_17)"/>
+        <path fill-opacity="0.24" stroke="#000000" id="svg_6"
+              d="m8.272005,20.373488l13.805666,-14.291498l13.805666,14.291498l-13.805666,14.291498l-13.805666,-14.291498z"
+              stroke-width="2" fill="url(#svg_18)"/>
+        <text stroke="#000" font-weight="bold"
+              transform="rotate(45.16088104248047 22.13776206970214,20.90498733520508) matrix(1.3511087894439697,0,0,1.3216950022574565,-6.166348114609718,-4.992947681582635) "
+              xml:space="preserve" font-family="Oswald, sans-serif" font-size="12" id="svg_7"
+              y="23.74207" x="16.937978" stroke-opacity="null" stroke-width="0" fill="#000000">P</text>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<application>
+  <component name="DimensionService">
+    <location key="new project wizard.0.0.1366.768" x="74" y="0" />
+    <location key="WELCOME_SCREEN.0.0.1366.768" x="691" y="327" />
+    <location key="#Project_Structure.0.0.1366.768" x="275" y="25" />
+    <location key="com.intellij.ide.util.TipDialog.0.0.1366.768" x="338" y="191" />
+    <location key="SettingsEditor.0.0.1366.768" x="163" y="0" />
+    <location key="search.everywhere.popup.0.0.1366.768" x="346" y="49" />
+    <location key="#Plugins.0.0.1366.768" x="275" y="25" />
+    <location key="IDE.errors.dialog.0.0.1366.768" x="263" y="93" />
+    <size key="search.everywhere.popup.0.0.1366.768" width="672" height="678" />
+  </component>
+</application>

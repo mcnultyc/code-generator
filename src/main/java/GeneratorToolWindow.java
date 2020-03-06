@@ -54,7 +54,6 @@ public class GeneratorToolWindow implements ActionListener {
         classTextField4.setText("ProductA");
         classTextField4.setForeground(new Color(-9211021));
 
-
         logger.info("CREATING COMPONENT");
         generateButton.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){

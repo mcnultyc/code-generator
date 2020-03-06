@@ -45,6 +45,8 @@ public class GeneratorToolWindow implements ActionListener {
 
     public GeneratorToolWindow(ToolWindow toolWindow) {
         $$$setupUI$$$();
+        // load values from config file
+
         classTextField1.setText("Factory");
         classTextField1.setForeground(new Color(-9211021));
         classTextField2.setText("ConcreteFactory");
@@ -70,14 +72,19 @@ public class GeneratorToolWindow implements ActionListener {
                 // Load the configuration file
                 Config config = ConfigFactory.parseReader(reader);
 
+
+
                 // Load the destination directory for designs being generated
                 String directory = config.getString("conf.path");
+
+
 
                 logger.info("DIRECTORY:"+directory);
                 inStream.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 

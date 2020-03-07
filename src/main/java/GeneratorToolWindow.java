@@ -27,10 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -107,17 +104,27 @@ public class GeneratorToolWindow{
         generateButton.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){
                 String pattern = (String) patternComboBox.getSelectedItem();
+
+
+                // Read the fields to update the design pattern
+                readFields(pattern);
+
                 // Create config from design map of respective pattern
                 Config config = ConfigFactory.parseMap(designMaps.get(pattern));
                 // Create design pattern generator based on config
                 DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
-                // Get the currently open project
-                Project project = getActiveProject();
-                if(project != null){
-                    // Get the path to generate file
-                    String path = getSourcePath(project);
-                    // Generate files at given path
-                    generator.generate(path);
+                if(generator != null){
+                    // Get the currently open project
+                    Project project = getActiveProject();
+                    if(project != null){
+                        // Get the path to generate file
+                        String path = getSourcePath(project);
+                        // Generate files at given path
+                        generator.generate(path);
+                    }
+                }
+                else{
+
                 }
             }
         });
@@ -268,16 +275,32 @@ public class GeneratorToolWindow{
 
     private void readFields(String pattern){
         if(validateFields()) {
-            Map<String, Object> designMap = designMaps.get(pattern);
+            // Copy original design pattern map to update fields
+            Map<String, Object> designMap = new TreeMap<>();
+            designMap.putAll(designMaps.get(pattern));
+            // Get the keys used for fields for given design pattern
             List<String> tableKeys = getTableKeys(pattern);
+            // Get the keys used for table headers for given design pattern
             List<String> fieldKeys = getFieldKeys(pattern);
-
+            // Update design pattern map to user input
             for(int i = 0; i < fields.length && i < fieldKeys.size(); i++){
-                designMap.put(fieldKeys.get(i), "Default");
+                designMap.put(fieldKeys.get(i), fields[i]);
             }
-
-
-
+            // Check if table 1 is enabled before reading table input
+            if(table1.isEnabled()){
+                TableModel model = table1.getModel();
+                List<String> values = new ArrayList<>();
+                for(int i = 0; i < model.getRowCount(); i++){
+                    Object object = model.getValueAt(i, 0);
+                    if (object != null){
+                        String value = (String)object;
+                        if(!value.equals("")){
+                            values.add(value);
+                        }
+                    }
+                }
+                // TODO table
+            }
         }
     }
 

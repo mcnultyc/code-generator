@@ -1,45 +1,26 @@
-import com.github.javaparser.utils.ProjectRoot;
-import com.google.gson.internal.$Gson$Preconditions;
-import com.intellij.ide.DataManager;
-import com.intellij.notification.Notification;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.table.JBTable;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.typesafe.config.*;
-import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.lang.model.SourceVersion;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
@@ -57,16 +38,14 @@ public class GeneratorToolWindow{
     private JList list1;
     private JTable table1;
     private JTable table2;
-    private JButton addButton1;
-    private JButton addButton2;
+    private JButton addRowButton1;
+    private JButton addRowButton2;
     private JButton generateButton;
     private JPanel tablesPanel;
     private JScrollPane table1ScrollPane;
     private JScrollPane table2ScrollPane;
     private Map<String, Map<String, Object>> designMaps;
     private JTextField[] fields;
-
-    private int flip = 1;
 
     private static Logger logger = LoggerFactory.getLogger(GeneratorToolWindow.class);
 
@@ -78,8 +57,8 @@ public class GeneratorToolWindow{
         table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
 
-        table1.getTableHeader().setForeground(Color.LIGHT_GRAY);
-        table2.getTableHeader().setForeground(Color.LIGHT_GRAY);
+        table1.getTableHeader().setForeground(Color.DARK_GRAY);
+        table2.getTableHeader().setForeground(Color.DARK_GRAY);
 
         fields = new JTextField[4];
         fields[0] = classTextField1;
@@ -88,10 +67,27 @@ public class GeneratorToolWindow{
         fields[3] = classTextField4;
 
 
-
-
-
         logger.info("CREATING COMPONENT");
+
+        // Add action listener to table 1 add button
+        addRowButton1.addActionListener(e ->{
+            // Only add rows to enabled tables
+            if(table1.isEnabled()){
+                DefaultTableModel model = (DefaultTableModel) table1.getModel();
+                // Add row to table 1
+                model.addRow(new Object[]{});
+            }
+        });
+
+        // Add action listener to table 2 add button
+        addRowButton2.addActionListener(e ->{
+            // Only add rows to enabled tables
+            if(table2.isEnabled()){
+                DefaultTableModel model = (DefaultTableModel) table2.getModel();
+                // Add row to table 2
+                model.addRow(new Object[]{});
+            }
+        });
 
         patternComboBox.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){
@@ -101,26 +97,30 @@ public class GeneratorToolWindow{
             }
         });
 
-
         generateButton.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){
+                // Get the currently selected pattern
                 String pattern = (String) patternComboBox.getSelectedItem();
-
 
                 // Read the fields to update the design pattern
                 Map<String, Object> designMap = readFields(pattern);
+
                 // Check if design map was built from user input
                 if(designMap == null){
                     return;
                 }
+
                 // Create config from design map of respective pattern
                 Config config = ConfigFactory.parseMap(designMap);
+
                 // Create design pattern generator based on config
                 DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
                 if(generator != null){
+
                     // Get the currently open project
                     Project project = getActiveProject();
                     if(project != null){
+
                         // Get the path to generate file
                         String path = getSourcePath(project);
                         // Generate files at given path
@@ -130,7 +130,11 @@ public class GeneratorToolWindow{
             }
         });
 
+        // Store the list of design patterns supported
+        List<String> patterns = new ArrayList<>();
+
         try {
+            // Get the config file input stream
             InputStream inStream = GeneratorToolWindow.class.getResourceAsStream("design-patterns.conf");
             if (inStream != null) {
                 Reader reader = new InputStreamReader(inStream);
@@ -155,13 +159,30 @@ public class GeneratorToolWindow{
                     designConfig.entrySet()
                             .forEach(e -> {designMap.put(e.getKey(), e.getValue().unwrapped());});
                     designMaps.put(pattern, designMap);
+                    patterns.add(pattern);
                 }
+
                 inStream.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
 
         }
+
+        // Add patterns to combo box
+        for(String pattern: patterns){
+            patternComboBox.addItem(pattern);
+        }
+
+        // Check if design patterns were found
+        if(patterns.size() > 0) {
+            // Set the default design pattern for combo box
+            updateFields(patterns.get(0));
+        }
+        else{
+            logger.error("NO DESIGN PATTERNS IN CONFIG FILE");
+        }
+
     }
 
     private void updateToolTips(String pattern){
@@ -169,10 +190,12 @@ public class GeneratorToolWindow{
     }
 
     private String getSourcePath(Project project){
+
         // Get the project manager
         ProjectRootManager manager = ProjectRootManager.getInstance(project);
         // Get all the source roots in the project
         VirtualFile[] sourceRoots = manager.getContentSourceRoots();
+
         // Check if project has any existing source roots
         if(sourceRoots.length > 0){
             String path = sourceRoots[0].getPath();
@@ -188,16 +211,20 @@ public class GeneratorToolWindow{
                 return path;
             }
         }
+
         // Return path of working directory
         return System.getProperty("user.dir");
     }
 
     private Project getActiveProject(){
+
         // Get list of open projects
         Project[] projects = ProjectManager.getInstance().getOpenProjects();
+
         // Iterate through open projects looking for active project
         for (Project project : projects) {
             Window window = WindowManager.getInstance().suggestParentWindow(project);
+
             // Check for active window
             if (window != null && window.isActive()) {
                 return project;
@@ -206,35 +233,46 @@ public class GeneratorToolWindow{
         return null;
     }
 
+
+    private void updateTable(String headerText, JTable table, boolean enabled){
+
+        // Set enabled flag for table
+        table.setEnabled(enabled);
+
+        // Set the header for table
+        JTableHeader header = table.getTableHeader();
+        TableColumnModel columnModel = header.getColumnModel();
+        columnModel.getColumn(0).setHeaderValue(headerText);
+
+        // Clear data from table
+        for(int i = 0; i < table.getRowCount(); i++){
+            for(int j = 0; j < table.getColumnCount(); j++){
+                table.setValueAt("", i, j);
+            }
+        }
+
+        // Set row count back to original 3 rows
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setRowCount(3);
+    }
+
     private void updateTables(List<String> headerTexts){
 
-        table1.getTableHeader().setForeground(Color.LIGHT_GRAY);
-        table2.getTableHeader().setForeground(Color.LIGHT_GRAY);
-
-        // Set header texts to blank by default
-        String header1Text = "";
-        String header2Text = "";
-        // Set tables disabled by default
-        table1.setEnabled(false);
-        table2.setEnabled(false);
-        // Enable table 1 and set table 1 header text
-        if(headerTexts.size() >= 1){
-            header1Text = headerTexts.get(0);
-            table1.setEnabled(true);
+        if(headerTexts.size() == 0){
+            // Remove headers and disable both tables
+            updateTable("", table1, false);
+            updateTable("", table2, false);
         }
-        // Enable table 2 and set table 2 header text
-        if(headerTexts.size() >= 2){
-            header2Text = headerTexts.get(1);
-            table2.setEnabled(true);
+        if(headerTexts.size() == 1){
+            // Add header to first table and disable second table
+            updateTable(headerTexts.get(0), table1, true);
+            updateTable("", table2, false);
         }
-        // Set the header for table 1
-        JTableHeader header = table1.getTableHeader();
-        TableColumnModel model = header.getColumnModel();
-        model.getColumn(0).setHeaderValue(header1Text);;
-        // Set the header for table 2
-        header = table2.getTableHeader();
-        model = header.getColumnModel();
-        model.getColumn(0).setHeaderValue(header2Text);
+        else if(headerTexts.size() >= 2){
+            // Add headers and enable both tables
+            updateTable(headerTexts.get(0), table1, true);
+            updateTable(headerTexts.get(1), table2, true);
+        }
 
         table1.repaint();
         table2.repaint();
@@ -296,9 +334,11 @@ public class GeneratorToolWindow{
 
         // Get the number of fields, -1 to exclude design pattern key
         int numFields = getFieldKeys(pattern).size() - 1;
+
         // Check that each field is valid
         for(int i = 0; i < numFields; i++){
             String name = fields[i].getText();
+
             // Check that name is a valid class name
             if(name.equals("") || !isValidClassName(name)){
                 logger.error("INVALID CLASS NAME: "+name);
@@ -321,14 +361,19 @@ public class GeneratorToolWindow{
     }
 
     private List<String> getValues(JTable table){
+
+        // Get model from table
         TableModel model = table.getModel();
         List<String> values = new ArrayList<>();
+
         // Get values from table 1
         for(int i = 0; i < model.getRowCount(); i++){
             Object object = model.getValueAt(i, 0);
+
             // Check if table entry has input
             if (object != null){
                 String value = (String)object;
+
                 // Check for valid user input
                 if(!value.equals("")){
                     values.add(value);
@@ -420,45 +465,18 @@ public class GeneratorToolWindow{
 
     private void createUIComponents() {
 
-        String[] patterns = {"Abstract Factory", "Factory Method", "Builder", "Chain"};
-        patternComboBox = new ComboBox(patterns);
-
-
-        DefaultListModel<String> listModel1 = new DefaultListModel<>();
-        listModel1.addElement("hello");
-        listModel1.addElement("how");
-        listModel1.addElement("are");
-
-        list1 = new JBList(listModel1);
+        patternComboBox = new ComboBox();
 
         DefaultTableModel model1 = new DefaultTableModel(3, 1);
-        model1.setColumnIdentifiers(new String[]{"ProductA"});
-
         table1 = new JBTable(model1);
-        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
-        tableCellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        table1.getColumn("ProductA").setHeaderRenderer(tableCellRenderer);
 
         DefaultTableModel model2 = new DefaultTableModel(3, 1);
-        model2.setColumnIdentifiers(new String[]{"ProductB"});
-
         table2 = new JBTable(model2);
-        table2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableCellRenderer = new DefaultTableCellRenderer();
-        tableCellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        table2.getColumn("ProductB").setHeaderRenderer(tableCellRenderer);
-
-
-
-        //table2.setVisible(false);
-        //table2.setEnabled(false);
 
         classTextField1 = new TextField();
         classTextField2 = new TextField();
         classTextField3 = new TextField();
         classTextField4 = new TextField();
-
     }
 
     /**
@@ -493,12 +511,12 @@ public class GeneratorToolWindow{
         contentPane.add(panel1, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel1.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        addButton1 = new JButton();
-        addButton1.setText("Button");
-        panel1.add(addButton1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        addButton2 = new JButton();
-        addButton2.setText("Button");
-        panel1.add(addButton2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addRowButton1 = new JButton();
+        addRowButton1.setText("Button");
+        panel1.add(addRowButton1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        addRowButton2 = new JButton();
+        addRowButton2.setText("Button");
+        panel1.add(addRowButton2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane1 = new JScrollPane();
         panel1.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         scrollPane1.setViewportView(table1);

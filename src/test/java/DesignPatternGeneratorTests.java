@@ -241,4 +241,9 @@ public class DesignPatternGeneratorTests {
             }
         }
     }
+
+    @Test
+    public void testFieldFocusListener(){
+
+    }
 }

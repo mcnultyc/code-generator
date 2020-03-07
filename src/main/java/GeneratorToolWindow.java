@@ -25,6 +25,7 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.lang.model.SourceVersion;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.*;
@@ -107,10 +108,13 @@ public class GeneratorToolWindow{
 
 
                 // Read the fields to update the design pattern
-                readFields(pattern);
-
+                Map<String, Object> designMap = readFields(pattern);
+                // Check if design map was built from user input
+                if(designMap == null){
+                    return;
+                }
                 // Create config from design map of respective pattern
-                Config config = ConfigFactory.parseMap(designMaps.get(pattern));
+                Config config = ConfigFactory.parseMap(designMap);
                 // Create design pattern generator based on config
                 DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
                 if(generator != null){
@@ -122,9 +126,6 @@ public class GeneratorToolWindow{
                         // Generate files at given path
                         generator.generate(path);
                     }
-                }
-                else{
-
                 }
             }
         });
@@ -263,18 +264,82 @@ public class GeneratorToolWindow{
             if(entry.getValue() instanceof List){
                 List<String> values = (List<String>)entry.getValue();
                 // First element in list contains header text
-                keys.add(values.get(0));
+                keys.add(entry.getKey());
             }
         }
         return keys;
     }
 
-    private boolean validateFields(){
+    private boolean isValidClassName(String name){
+        // Check that name is not a keyword and is a valid class name
+        return !SourceVersion.isKeyword(name) && SourceVersion.isName(name);
+    }
+
+    private boolean validateTable(JTable table){
+        // Get all user input from table
+        List<String> values = getValues(table);
+        // No user input in table (depends on pattern, check that enabled first)
+        if(values.size() == 0){
+            return false;
+        }
+        // Check that each name is table is valid
+        for(String name: values){
+            if(!isValidClassName(name)){
+                logger.error("INVALID CLASS NAME IN TABLE: "+name);
+                return false;
+            }
+        }
         return true;
     }
 
-    private void readFields(String pattern){
-        if(validateFields()) {
+    private boolean validateFields(String pattern){
+
+        // Get the number of fields, -1 to exclude design pattern key
+        int numFields = getFieldKeys(pattern).size() - 1;
+        // Check that each field is valid
+        for(int i = 0; i < numFields; i++){
+            String name = fields[i].getText();
+            // Check that name is a valid class name
+            if(name.equals("") || !isValidClassName(name)){
+                logger.error("INVALID CLASS NAME: "+name);
+                return false;
+            }
+        }
+        if(table1.isEnabled()){
+            // Check that table 1 has valid input
+            if(!validateTable(table1)){
+                return false;
+            }
+        }
+        if(table2.isEnabled()){
+            // Check that table 2 has valid input
+            if(!validateTable(table2)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<String> getValues(JTable table){
+        TableModel model = table.getModel();
+        List<String> values = new ArrayList<>();
+        // Get values from table 1
+        for(int i = 0; i < model.getRowCount(); i++){
+            Object object = model.getValueAt(i, 0);
+            // Check if table entry has input
+            if (object != null){
+                String value = (String)object;
+                // Check for valid user input
+                if(!value.equals("")){
+                    values.add(value);
+                }
+            }
+        }
+        return values;
+    }
+
+    private Map<String, Object> readFields(String pattern){
+        if(validateFields(pattern)) {
             // Copy original design pattern map to update fields
             Map<String, Object> designMap = new TreeMap<>();
             designMap.putAll(designMaps.get(pattern));
@@ -282,26 +347,31 @@ public class GeneratorToolWindow{
             List<String> tableKeys = getTableKeys(pattern);
             // Get the keys used for table headers for given design pattern
             List<String> fieldKeys = getFieldKeys(pattern);
+            // Remove design pattern key from list
+            fieldKeys.remove("design-pattern");
             // Update design pattern map to user input
             for(int i = 0; i < fields.length && i < fieldKeys.size(); i++){
-                designMap.put(fieldKeys.get(i), fields[i]);
+                designMap.put(fieldKeys.get(i), fields[i].getText());
             }
             // Check if table 1 is enabled before reading table input
             if(table1.isEnabled()){
-                TableModel model = table1.getModel();
-                List<String> values = new ArrayList<>();
-                for(int i = 0; i < model.getRowCount(); i++){
-                    Object object = model.getValueAt(i, 0);
-                    if (object != null){
-                        String value = (String)object;
-                        if(!value.equals("")){
-                            values.add(value);
-                        }
-                    }
+                List<String> values = getValues(table1);
+                if(tableKeys.size() > 0){
+                    System.err.println(tableKeys);
+                    // Set values from given design map (usually subclasses)
+                    designMap.put(tableKeys.get(0), values);
                 }
-                // TODO table
             }
+            // Check if table 2 is enabled before reading input
+            if(table2.isEnabled()){
+                List<String> values = getValues(table2);
+                if(tableKeys.size() > 1){
+                    designMap.put(tableKeys.get(1), values);
+                }
+            }
+            return designMap;
         }
+        return null;
     }
 
     private void updateFields(String pattern){

@@ -27,7 +27,7 @@ public class DesignPatternGeneratorTests {
 
         // Facade pattern description in conf
         String facadeConf = "    {\n" +
-                "        design-pattern  = \"facade\"\n" +
+                "        design-pattern  = \"Facade\"\n" +
                 "        facade          = \"Facade\"\n" +
                 "        concrete-facade = \"Facade1\"\n" +
                 "        subsystems      = [\n" +
@@ -51,7 +51,7 @@ public class DesignPatternGeneratorTests {
 
         // Chain pattern description in conf
         String chainConf = "    {\n" +
-                "        design-pattern      = \"chain\"\n" +
+                "        design-pattern      = \"Chain\"\n" +
                 "        sender              = \"Sender\"\n" +
                 "        handler             = \"Handler\"\n" +
                 "        concrete-handlers   = [\n" +
@@ -243,7 +243,14 @@ public class DesignPatternGeneratorTests {
     }
 
     @Test
-    public void testFieldFocusListener(){
-
+    public void testFieldFocusListenerDefaultText(){
+        TextField textField = new TextField();
+        textField.setDefaultText("Default");
+        // Test slightly strange behavior used by focus listener
+        assertEquals("Default", textField.getDefaultText());
+        // If default text is set and hasn't been updated by user then
+        // text is blank
+        // Only focus listener can change the default state
+        assertEquals("", textField.getText());
     }
 }

@@ -1,18 +1,34 @@
+/**
+ * @author Carlos Antonio McNulty
+ */
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+
 public class TextField extends JTextField {
+
 
     private boolean isDefault;
     private String defaultText;
 
+
+    /**
+     *
+     */
     public TextField(){
         // Create text field with blank default text
         this("");
     }
 
+
+    /**
+     *
+     * @param defaultText
+     */
     public TextField(String defaultText){
         // Text field starts off in default state
         this.isDefault = true;
@@ -47,10 +63,20 @@ public class TextField extends JTextField {
         });
     }
 
+
+    /**
+     *
+     * @return
+     */
     public String getDefaultText(){
         return defaultText;
     }
 
+
+    /**
+     *
+     * @param defaultText
+     */
     public void setDefaultText(String defaultText){
         this.defaultText = defaultText;
         // Set default text
@@ -60,6 +86,11 @@ public class TextField extends JTextField {
         isDefault = true;
     }
 
+
+    /**
+     *
+     * @return
+     */
     @Override
     public String getText() {
         // Default text is just a placeholder

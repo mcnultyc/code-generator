@@ -19,8 +19,7 @@
         </constraints>
         <properties/>
       </component>
-      <grid id="ff703" binding="tablesPanel" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="true" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
+      <grid id="ff703" binding="tablesPanel" layout-manager="GridBagLayout">
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -34,8 +33,11 @@
                 <preferred-size width="25" height="25"/>
                 <maximum-size width="25" height="25"/>
               </grid>
+              <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
+              <maximumSize width="25" height="25"/>
+              <minimumSize width="25" height="25"/>
               <text value="+"/>
             </properties>
           </component>
@@ -46,14 +48,18 @@
                 <preferred-size width="25" height="25"/>
                 <maximum-size width="25" height="25"/>
               </grid>
+              <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
+              <maximumSize width="25" height="25"/>
+              <minimumSize width="25" height="25"/>
               <text value="+"/>
             </properties>
           </component>
           <scrollpane id="bf5c5" binding="table1ScrollPane">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="0" bottom="5" right="5" weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -69,6 +75,7 @@
           <scrollpane id="d283b" binding="table2ScrollPane">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag top="0" left="5" bottom="5" right="0" weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties/>
             <border type="none"/>

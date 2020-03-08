@@ -1,5 +1,8 @@
-import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
+/**
+ * @author Carlos Antonio McNulty
+ */
+
+
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -323,6 +326,15 @@ public class GeneratorToolWindow{
 
     private void updateTables(List<String> headerTexts){
 
+        // Make table scroll panes invisible by default
+        table1ScrollPane.setVisible(false);
+        table2ScrollPane.setVisible(false);
+
+        // Make table buttons invisible buttons
+        addRowButton1.setVisible(false);
+        addRowButton2.setVisible(false);
+
+        // Make scroll panes and buttons visible selectively
         if(headerTexts.size() == 0){
 
             // Remove headers and disable both tables
@@ -334,12 +346,25 @@ public class GeneratorToolWindow{
             // Add header to first table and disable second table
             updateTable(headerTexts.get(0), table1, true);
             updateTable("", table2, false);
+
+            // Make table 1 scroll pane and button visible
+            table1ScrollPane.setVisible(true);
+            addRowButton1.setVisible(true);
+
         }
         else if(headerTexts.size() >= 2){
 
             // Add headers and enable both tables
             updateTable(headerTexts.get(0), table1, true);
             updateTable(headerTexts.get(1), table2, true);
+
+            // Make both tables scroll panes visible
+            table1ScrollPane.setVisible(true);
+            table2ScrollPane.setVisible(true);
+
+            // Make both tables buttons visible
+            addRowButton1.setVisible(true);
+            addRowButton2.setVisible(true);
         }
 
         table1.repaint();
@@ -555,11 +580,11 @@ public class GeneratorToolWindow{
 
         int i = 0;
         for(;i < fields.length && i < fieldTexts.size(); i++){
+            // Set defualt text for field and update visibility
             fields[i].setVisible(true);
             TextField f = (TextField)fields[i];
             f.setDefaultText(fieldTexts.get(i));
 
-            //fields[i].setText(fieldTexts.get(i));
             fields[i].setForeground(Color.DARK_GRAY);
         }
 

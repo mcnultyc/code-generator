@@ -81,9 +81,11 @@ public class GeneratorToolWindow{
 
         // Add action listener to table 2 add button
         addRowButton2.addActionListener(e ->{
+
             // Only add rows to enabled tables
             if(table2.isEnabled()){
                 DefaultTableModel model = (DefaultTableModel) table2.getModel();
+
                 // Add row to table 2
                 model.addRow(new Object[]{});
             }
@@ -99,7 +101,8 @@ public class GeneratorToolWindow{
 
         generateButton.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){
-                // Get the currently selected pattern
+
+                 // Get the currently selected pattern
                 String pattern = (String) patternComboBox.getSelectedItem();
 
                 // Read the fields to update the design pattern
@@ -134,6 +137,7 @@ public class GeneratorToolWindow{
         List<String> patterns = new ArrayList<>();
 
         try {
+
             // Get the config file input stream
             InputStream inStream = GeneratorToolWindow.class.getResourceAsStream("design-patterns.conf");
             if (inStream != null) {
@@ -155,6 +159,7 @@ public class GeneratorToolWindow{
                 for(Config designConfig: configs){
                     String pattern = designConfig.getString("design-pattern");
                     Map<String, Object> designMap = new TreeMap<>();
+
                     // Add key-value pairs from config to map
                     designConfig.entrySet()
                             .forEach(e -> {designMap.put(e.getKey(), e.getValue().unwrapped());});
@@ -193,20 +198,24 @@ public class GeneratorToolWindow{
 
         // Get the project manager
         ProjectRootManager manager = ProjectRootManager.getInstance(project);
+
         // Get all the source roots in the project
         VirtualFile[] sourceRoots = manager.getContentSourceRoots();
 
         // Check if project has any existing source roots
         if(sourceRoots.length > 0){
             String path = sourceRoots[0].getPath();
+
             // Return path of first source root found
             return path;
         }
         else{
+
             // Get all content roots of project
             VirtualFile[] contentRoots = manager.getContentRoots();
             if(contentRoots.length > 0){
                 String path = contentRoots[0].getPath();
+
                 // Return path of first content root found
                 return path;
             }
@@ -259,16 +268,19 @@ public class GeneratorToolWindow{
     private void updateTables(List<String> headerTexts){
 
         if(headerTexts.size() == 0){
+
             // Remove headers and disable both tables
             updateTable("", table1, false);
             updateTable("", table2, false);
         }
         if(headerTexts.size() == 1){
+
             // Add header to first table and disable second table
             updateTable(headerTexts.get(0), table1, true);
             updateTable("", table2, false);
         }
         else if(headerTexts.size() >= 2){
+
             // Add headers and enable both tables
             updateTable(headerTexts.get(0), table1, true);
             updateTable(headerTexts.get(1), table2, true);
@@ -279,11 +291,14 @@ public class GeneratorToolWindow{
     }
 
     private List<String> getFieldKeys(String pattern){
+
         // Get design map for given pattern
         Map<String, Object> designMap = designMaps.get(pattern);
         List<String> keys = new ArrayList<>();
+
         // Go through the entries in the design pattern map
         for(Map.Entry<String, Object> entry: designMap.entrySet()){
+
             // Check if object is of type string
             if(entry.getValue() instanceof String){
                 keys.add(entry.getKey());
@@ -293,14 +308,17 @@ public class GeneratorToolWindow{
     }
 
     private List<String> getTableKeys(String pattern){
+
         // Get design map for given pattern
         Map<String, Object> designMap = designMaps.get(pattern);
         List<String> keys = new ArrayList<>();
+
         // Go through the entries in the design pattern map
         for(Map.Entry<String, Object> entry: designMap.entrySet()){
+
             // Check if object is of type list for subclass lists
             if(entry.getValue() instanceof List){
-                List<String> values = (List<String>)entry.getValue();
+
                 // First element in list contains header text
                 keys.add(entry.getKey());
             }
@@ -309,17 +327,21 @@ public class GeneratorToolWindow{
     }
 
     private boolean isValidClassName(String name){
+
         // Check that name is not a keyword and is a valid class name
         return !SourceVersion.isKeyword(name) && SourceVersion.isName(name);
     }
 
     private boolean validateTable(JTable table){
+
         // Get all user input from table
         List<String> values = getValues(table);
+
         // No user input in table (depends on pattern, check that enabled first)
         if(values.size() == 0){
             return false;
         }
+
         // Check that each name is table is valid
         for(String name: values){
             if(!isValidClassName(name)){
@@ -384,29 +406,38 @@ public class GeneratorToolWindow{
     }
 
     private Map<String, Object> readFields(String pattern){
+
         if(validateFields(pattern)) {
+
             // Copy original design pattern map to update fields
             Map<String, Object> designMap = new TreeMap<>();
             designMap.putAll(designMaps.get(pattern));
+
             // Get the keys used for fields for given design pattern
             List<String> tableKeys = getTableKeys(pattern);
+
             // Get the keys used for table headers for given design pattern
             List<String> fieldKeys = getFieldKeys(pattern);
+
             // Remove design pattern key from list
             fieldKeys.remove("design-pattern");
+
             // Update design pattern map to user input
             for(int i = 0; i < fields.length && i < fieldKeys.size(); i++){
                 designMap.put(fieldKeys.get(i), fields[i].getText());
             }
+
             // Check if table 1 is enabled before reading table input
             if(table1.isEnabled()){
                 List<String> values = getValues(table1);
                 if(tableKeys.size() > 0){
                     System.err.println(tableKeys);
+
                     // Set values from given design map (usually subclasses)
                     designMap.put(tableKeys.get(0), values);
                 }
             }
+
             // Check if table 2 is enabled before reading input
             if(table2.isEnabled()){
                 List<String> values = getValues(table2);
@@ -420,6 +451,7 @@ public class GeneratorToolWindow{
     }
 
     private void updateFields(String pattern){
+
         // Get design map for given pattern
         Map<String, Object> designMap = designMaps.get(pattern);
 
@@ -429,9 +461,11 @@ public class GeneratorToolWindow{
 
         // Go through the entries in the design pattern map
         for(Map.Entry<String, Object> entry: designMap.entrySet()){
+
             // Check if object is of type list for subclass lists
             if(entry.getValue() instanceof List){
                 List<String> values = (List<String>)entry.getValue();
+
                 // First element in list contains header text
                 headerTexts.add(values.get(0));
             }
@@ -442,8 +476,7 @@ public class GeneratorToolWindow{
         }
 
         int i = 0;
-        // Set field texts for a max of 4 fields
-        for(;i < 4 && i < fieldTexts.size(); i++){
+        for(;i < fields.length && i < fieldTexts.size(); i++){
             fields[i].setVisible(true);
             TextField f = (TextField)fields[i];
             f.setDefaultText(fieldTexts.get(i));
@@ -451,11 +484,13 @@ public class GeneratorToolWindow{
             //fields[i].setText(fieldTexts.get(i));
             fields[i].setForeground(Color.DARK_GRAY);
         }
+
         // Set remaining blank fields as invisible
         for(; i < 4; i++){
             fields[i].setVisible(false);
             fields[i].setText("");
         }
+
         // Update table headers
         updateTables(headerTexts);
 

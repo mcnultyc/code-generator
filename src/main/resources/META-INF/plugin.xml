@@ -16,7 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <toolWindow id="My Sample Tool Window" anchor="right"  factoryClass="GeneratorToolWindowFactory"/>
+        <toolWindow id="Design Pattern Generator" anchor="right"  factoryClass="GeneratorToolWindowFactory"/>
     </extensions>
 
     <actions>

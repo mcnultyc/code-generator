@@ -6,10 +6,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.table.JBTable;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
+
 import com.typesafe.config.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,37 +34,41 @@ public class GeneratorToolWindow{
     private JTextField classTextField2;
     private JTextField classTextField3;
 
-    private JList list1;
     private JTable table1;
     private JTable table2;
+
     private JButton addRowButton1;
     private JButton addRowButton2;
     private JButton generateButton;
+
     private JPanel tablesPanel;
     private JScrollPane table1ScrollPane;
     private JScrollPane table2ScrollPane;
+
     private Map<String, Map<String, Object>> designMaps;
+    private Map<String, Map<String, String>> toolTipMaps;
+
     private JTextField[] fields;
 
     private static Logger logger = LoggerFactory.getLogger(GeneratorToolWindow.class);
 
-    public GeneratorToolWindow(ToolWindow toolWindow) {
-        $$$setupUI$$$();
-        // load values from config file
 
+    public GeneratorToolWindow(ToolWindow toolWindow) {
+
+        // Set the border color and thickness of the table scroll panes
         table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-
+        // Set the color of the table headers
         table1.getTableHeader().setForeground(Color.DARK_GRAY);
         table2.getTableHeader().setForeground(Color.DARK_GRAY);
 
+        // Each field becomes element in array (for convenience)
         fields = new JTextField[4];
         fields[0] = classTextField1;
         fields[1] = classTextField2;
         fields[2] = classTextField3;
         fields[3] = classTextField4;
-
 
         logger.info("CREATING COMPONENT");
 
@@ -133,6 +136,12 @@ public class GeneratorToolWindow{
             }
         });
 
+        // Create tree map to store maps for each design pattern
+        designMaps = new TreeMap<>();
+
+        // Create tree map to store tool tips for each design pattern
+        toolTipMaps = new TreeMap<>();
+
         // Store the list of design patterns supported
         List<String> patterns = new ArrayList<>();
 
@@ -146,14 +155,8 @@ public class GeneratorToolWindow{
                 // Load the configuration file
                 Config config = ConfigFactory.parseReader(reader);
 
-                // Update values in config object
-                config = config.withValue("conf.path", ConfigValueFactory.fromAnyRef("deeze nuts"));
-
                 // Get the list of configs for each design pattern
                 List<? extends Config> configs = config.getConfigList("design-patterns");
-
-                // Create tree map to store maps for each design pattern
-                designMaps = new TreeMap<>();
 
                 // Convert design pattern configs into maps
                 for(Config designConfig: configs){
@@ -166,6 +169,26 @@ public class GeneratorToolWindow{
                     designMaps.put(pattern, designMap);
                     patterns.add(pattern);
                 }
+
+                // Get the list of configs for each design pattern
+                List<? extends Config> toolTipConfigs = config.getConfigList("tool-tips");
+
+                // Convert tool tip config into map
+                for(Config toolTipConfig: toolTipConfigs){
+                    String pattern = toolTipConfig.getString("design-pattern");
+                    Map<String, String> toolTipMap = new TreeMap<>();
+
+                    // Add key-value pairs from config to map
+                    toolTipConfig.entrySet()
+                            .forEach(e -> {toolTipMap.put(e.getKey(), e.getValue().unwrapped().toString());});
+
+                    // Remove key for design pattern
+                    toolTipMap.remove("design-pattern");
+
+                    toolTipMaps.put(pattern, toolTipMap);
+                }
+
+                System.out.println(toolTipMaps);
 
                 inStream.close();
             }
@@ -190,9 +213,40 @@ public class GeneratorToolWindow{
 
     }
 
+
     private void updateToolTips(String pattern){
 
+        // Get the tool tip map for given design pattern
+        Map<String, String> toolTipMap = toolTipMaps.get(pattern);
+
+        // Get the field keys used by this design pattern
+        List<String> fieldKeys = getFieldKeys(pattern);
+
+        // Update tool tips for each field
+        for(int i = 0; i < fields.length && i < fieldKeys.size(); i++){
+            // Get tool tip text for given key
+            String toolTipText = toolTipMap.get(fieldKeys.get(i));
+            fields[i].setToolTipText(toolTipText);
+        }
+
+        // Get the table keys used by this design pattern
+        List<String> tableKeys = getTableKeys(pattern);
+
+        // Update tool tips for each table
+        if(tableKeys.size() >= 1){
+
+            // Set the tool tip text for table 1
+            String toolTipText = toolTipMap.get(tableKeys.get(0));
+            table1.setToolTipText(toolTipText);
+        }
+        if(tableKeys.size() >= 2){
+
+            // Set the tool tip text for table 2
+            String toolTipText = toolTipMap.get(tableKeys.get(1));
+            table2.setToolTipText(toolTipText);
+        }
     }
+
 
     private String getSourcePath(Project project){
 
@@ -224,6 +278,7 @@ public class GeneratorToolWindow{
         // Return path of working directory
         return System.getProperty("user.dir");
     }
+
 
     private Project getActiveProject(){
 
@@ -265,6 +320,7 @@ public class GeneratorToolWindow{
         tableModel.setRowCount(3);
     }
 
+
     private void updateTables(List<String> headerTexts){
 
         if(headerTexts.size() == 0){
@@ -290,6 +346,7 @@ public class GeneratorToolWindow{
         table2.repaint();
     }
 
+
     private List<String> getFieldKeys(String pattern){
 
         // Get design map for given pattern
@@ -304,8 +361,13 @@ public class GeneratorToolWindow{
                 keys.add(entry.getKey());
             }
         }
+
+        // Remove design pattern key (redundant)
+        keys.remove("design-pattern");
+
         return keys;
     }
+
 
     private List<String> getTableKeys(String pattern){
 
@@ -326,11 +388,13 @@ public class GeneratorToolWindow{
         return keys;
     }
 
+
     private boolean isValidClassName(String name){
 
         // Check that name is not a keyword and is a valid class name
         return !SourceVersion.isKeyword(name) && SourceVersion.isName(name);
     }
+
 
     private boolean validateTable(JTable table){
 
@@ -352,10 +416,11 @@ public class GeneratorToolWindow{
         return true;
     }
 
+
     private boolean validateFields(String pattern){
 
-        // Get the number of fields, -1 to exclude design pattern key
-        int numFields = getFieldKeys(pattern).size() - 1;
+        // Get the number of fields
+        int numFields = getFieldKeys(pattern).size();
 
         // Check that each field is valid
         for(int i = 0; i < numFields; i++){
@@ -382,6 +447,7 @@ public class GeneratorToolWindow{
         return true;
     }
 
+
     private List<String> getValues(JTable table){
 
         // Get model from table
@@ -405,6 +471,7 @@ public class GeneratorToolWindow{
         return values;
     }
 
+
     private Map<String, Object> readFields(String pattern){
 
         if(validateFields(pattern)) {
@@ -418,9 +485,6 @@ public class GeneratorToolWindow{
 
             // Get the keys used for table headers for given design pattern
             List<String> fieldKeys = getFieldKeys(pattern);
-
-            // Remove design pattern key from list
-            fieldKeys.remove("design-pattern");
 
             // Update design pattern map to user input
             for(int i = 0; i < fields.length && i < fieldKeys.size(); i++){
@@ -449,6 +513,7 @@ public class GeneratorToolWindow{
         }
         return null;
     }
+
 
     private void updateFields(String pattern){
 
@@ -491,6 +556,9 @@ public class GeneratorToolWindow{
             fields[i].setText("");
         }
 
+        // Update tool tips for pattern
+        updateToolTips(pattern);
+
         // Update table headers
         updateTables(headerTexts);
 
@@ -498,74 +566,26 @@ public class GeneratorToolWindow{
         contentPane.repaint();
     }
 
+
     private void createUIComponents() {
 
         patternComboBox = new ComboBox();
 
+        // Set the dimensions of table 1
         DefaultTableModel model1 = new DefaultTableModel(3, 1);
         table1 = new JBTable(model1);
 
+        // Set the dimensions of table 2
         DefaultTableModel model2 = new DefaultTableModel(3, 1);
         table2 = new JBTable(model2);
 
+        // Create the text fields for user input
         classTextField1 = new TextField();
         classTextField2 = new TextField();
         classTextField3 = new TextField();
         classTextField4 = new TextField();
     }
 
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
-    private void $$$setupUI$$$() {
-        createUIComponents();
-        contentPane = new JPanel();
-        contentPane.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
-        contentPane.setEnabled(true);
-        contentPane.setMinimumSize(new Dimension(318, 150));
-        contentPane.setPreferredSize(new Dimension(924, 150));
-        contentPane.add(patternComboBox, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(150, -1), null, null, 0, false));
-        classTextField1.setForeground(new Color(-9211021));
-        classTextField1.setName("");
-        classTextField1.setText("");
-        classTextField1.setToolTipText("Hello");
-        contentPane.add(classTextField1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        classTextField2.setText("");
-        contentPane.add(classTextField2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        classTextField3.setText("");
-        classTextField3.setVisible(true);
-        contentPane.add(classTextField3, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        classTextField4.setText("");
-        contentPane.add(classTextField4, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
-        contentPane.add(panel1, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        final Spacer spacer1 = new Spacer();
-        panel1.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-        addRowButton1 = new JButton();
-        addRowButton1.setText("Button");
-        panel1.add(addRowButton1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        addRowButton2 = new JButton();
-        addRowButton2.setText("Button");
-        panel1.add(addRowButton2, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        panel1.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        scrollPane1.setViewportView(table1);
-        final JScrollPane scrollPane2 = new JScrollPane();
-        panel1.add(scrollPane2, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        scrollPane2.setViewportView(table2);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    public JComponent $$$getRootComponent$$$() {
-        return contentPane;
-    }
 
     public JPanel getContent() {
         return contentPane;

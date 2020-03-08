@@ -1,3 +1,5 @@
+import com.intellij.notification.Notification;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -187,8 +189,6 @@ public class GeneratorToolWindow{
 
                     toolTipMaps.put(pattern, toolTipMap);
                 }
-
-                System.out.println(toolTipMaps);
 
                 inStream.close();
             }
@@ -409,7 +409,14 @@ public class GeneratorToolWindow{
         // Check that each name is table is valid
         for(String name: values){
             if(!isValidClassName(name)){
+
+                // Log error to console
                 logger.error("INVALID CLASS NAME IN TABLE: "+name);
+
+                // Send error notification to user
+                GeneratorErrorsNotifier notifier = new GeneratorErrorsNotifier();
+                notifier.notify(getActiveProject(), "Invalid class name in table: "+name);
+
                 return false;
             }
         }
@@ -428,7 +435,14 @@ public class GeneratorToolWindow{
 
             // Check that name is a valid class name
             if(name.equals("") || !isValidClassName(name)){
+
+                // Log error to console
                 logger.error("INVALID CLASS NAME: "+name);
+
+                // Send error notification to user
+                GeneratorErrorsNotifier notifier = new GeneratorErrorsNotifier();
+                notifier.notify(getActiveProject(), "Invalid class name: "+name);
+
                 return false;
             }
         }
@@ -495,7 +509,6 @@ public class GeneratorToolWindow{
             if(table1.isEnabled()){
                 List<String> values = getValues(table1);
                 if(tableKeys.size() > 0){
-                    System.err.println(tableKeys);
 
                     // Set values from given design map (usually subclasses)
                     designMap.put(tableKeys.get(0), values);

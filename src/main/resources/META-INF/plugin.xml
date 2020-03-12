@@ -1,11 +1,11 @@
 <idea-plugin>
-    <id>GeneratorPlugin.GeneratorPlugin</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>GeneratorPlugin</id>
+    <name>Design Pattern Generator</name>
+    <vendor email="cmcnul3@uic.edu">UIC</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    This plugin generates design patterns based on
+    the class names and or method names given.<br>
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -18,8 +18,4 @@
         <!-- Add your extensions here -->
         <toolWindow id="Design Pattern Generator" anchor="right"  factoryClass="GeneratorToolWindowFactory"/>
     </extensions>
-
-    <actions>
-        <!-- Add your actions here -->
-    </actions>
 </idea-plugin>

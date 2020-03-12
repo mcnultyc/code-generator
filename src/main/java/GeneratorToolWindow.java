@@ -10,6 +10,8 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
 
 import com.typesafe.config.*;
@@ -59,6 +61,15 @@ public class GeneratorToolWindow{
 
 
     public GeneratorToolWindow(ToolWindow toolWindow) {
+
+       // JBColor c = JBColor.namedColor("", Color.BLACK);
+       // JBTextField myVar = new JBTextField();
+       // myVar.setText("Hello");
+
+        //table1.setBackground(Color.GREEN);
+
+       // Color color = myVar.getForeground();
+        //System.out.println(color.getRGB());
 
         // Set the border color and thickness of the table scroll panes
         table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));

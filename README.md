@@ -1,4 +1,4 @@
-# Homework 1
+# Homework 2
 
 ## Build process
 
@@ -47,8 +47,9 @@ then use these methods to build their respective compilation units. This design
 naturally allows the use of the template method in the base class. The generate method
 of the [DesignPatternGenerator](src/main/java/DesignPatternGenerator.java) uses an abstract
 build method defined by the subclasses, such as the [AbstractFactoryPatternGenerator](src/main/java/AbstractFactoryPatternGenerator.java).
-
-
+The intellij sdk uses the factory method design pattern to create tool windows. I had to
+implement the ```ToolWindowFactory``` interface inside of my [GeneratorToolWindowFactory](src/main/java/GeneratorToolWindowFactory.java)
+class. The code for my specific tool window is inside of the [GeneratorToolWindow](src/main/java/GeneratorToolWindow.java) class.
 
 ## GUI / usage
 

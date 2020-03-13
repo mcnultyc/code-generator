@@ -10,7 +10,10 @@ or just use gradlew instead. For the following commands just
 replace gradle with gradlew:
 
 On Windows to create an intellij instance with the plugin
-installed you'll need to run the command ```gradle run```.
+installed you'll need to run the command ```gradle run```. You'll
+need to make sure that you run this command from the windows
+command prompt instead of other terminals like the Windows Subsystem
+for Linux (WSL).
 
 On linux you'll need to run these commands like ```./gradle```. You can
 install gradle by entering the command ```sudo apt install gradle```.
@@ -63,6 +66,9 @@ This seemed like a reasonable approach. If there
 already exists a file with the same filename as one
 of the generated files, then the generated file is
 not stored and the original file is not overwritten.
+I didn't have time to make the GUI look well on 
+both light and dark themes. Use a light theme as it's
+a little hard to see on darcula.
 
 ### Default text
 

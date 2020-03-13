@@ -30,6 +30,7 @@ import java.io.Reader;
 import java.util.*;
 import java.util.List;
 
+
 public class GeneratorToolWindow{
 
 
@@ -61,15 +62,6 @@ public class GeneratorToolWindow{
 
 
     public GeneratorToolWindow(ToolWindow toolWindow) {
-
-       // JBColor c = JBColor.namedColor("", Color.BLACK);
-       // JBTextField myVar = new JBTextField();
-       // myVar.setText("Hello");
-
-        //table1.setBackground(Color.GREEN);
-
-       // Color color = myVar.getForeground();
-        //System.out.println(color.getRGB());
 
         // Set the border color and thickness of the table scroll panes
         table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));

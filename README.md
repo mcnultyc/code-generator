@@ -13,7 +13,9 @@ On Windows to create an intellij instance with the plugin
 installed you'll need to run the command ```gradle run```. You'll
 need to make sure that you run this command from the windows
 command prompt instead of other terminals like the Windows Subsystem
-for Linux (WSL).
+for Linux (WSL). I've successfully ran ```gradle run``` on both macOS
+and Windows with the community edition of intellij version 2019.2.3.
+I'm not sure how it will interact with other versions of intellij.
 
 On linux you'll need to run these commands like ```./gradle```. You can
 install gradle by entering the command ```sudo apt install gradle```.

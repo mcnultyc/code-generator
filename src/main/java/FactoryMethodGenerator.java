@@ -76,17 +76,6 @@ public class FactoryMethodGenerator extends DesignPatternGenerator {
         this.concreteProducts = concreteProducts;
 
         build();
-
-        try {
-            InputStream inStream = FactoryMethodGenerator.class.getResourceAsStream("/test.txt");
-            URL res = FactoryMethodGenerator.class.getClassLoader().getResource("test.txt");
-            if (inStream != null && res != null) {
-                inStream.close();
-                System.err.println("Factory Located logback");
-            } else System.err.println("Factory logback.xml is not on classpath");
-        } catch (IOException e) {
-            System.err.println("Exception");
-        }
     }
 
 

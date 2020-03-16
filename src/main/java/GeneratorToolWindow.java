@@ -3,6 +3,7 @@
  */
 
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -10,10 +11,11 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBTextField;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.table.JBTable;
-
+import com.intellij.psi.*;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.typesafe.config.*;
 
 import org.slf4j.Logger;
@@ -23,10 +25,7 @@ import javax.lang.model.SourceVersion;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -417,10 +416,51 @@ public class GeneratorToolWindow{
     }
 
 
+    private boolean isNameClash(String name, Project project){
+
+        // Get the psi manage for active project
+        PsiManager psiManager = PsiManager.getInstance(project);
+
+        // Get all virtual files for active project
+        Collection<VirtualFile> files =
+        FileBasedIndex.getInstance()
+                .getContainingFiles(
+                        FileTypeIndex.NAME,
+                        JavaFileType.INSTANCE,
+                        GlobalSearchScope.projectScope(project));
+
+        // Search every file in the project
+        for(VirtualFile file: files){
+            PsiFile psiFile = psiManager.findFile(file);
+
+            // Check if file is java file (should be)
+            if(psiFile instanceof PsiJavaFile){
+                PsiJavaFile javaFile = (PsiJavaFile) psiFile;
+
+                // Check if file is in default package
+                if(javaFile.getPackageName().equals("")){
+
+                    // Get all classes in current file
+                    PsiClass[] psiClasses = javaFile.getClasses();
+
+                    // Look for name clash with all classes in file
+                    for(PsiClass psiClass: psiClasses){
+                        if(name.equals(psiClass.getName())){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean isValidClassName(String name){
 
         // Check that name is not a keyword and is a valid class name
-        return !SourceVersion.isKeyword(name) && SourceVersion.isName(name);
+        return !SourceVersion.isKeyword(name)
+                    && SourceVersion.isName(name)
+                        && !isNameClash(name, getActiveProject());
     }
 
 

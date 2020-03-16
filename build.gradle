@@ -51,6 +51,7 @@ dependencies {
 intellij {
     version '2019.2.3'
     type 'IC'
+    plugins 'java'
 }
 
 patchPluginXml {

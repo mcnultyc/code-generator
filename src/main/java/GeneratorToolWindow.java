@@ -4,6 +4,7 @@
 
 
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.ide.projectView.impl.nodes.PackageUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -416,7 +417,42 @@ public class GeneratorToolWindow{
     }
 
 
+    private boolean checkPackage(Project project, String packageName){
+
+        // TODO
+
+        // Get the project manager
+        ProjectRootManager manager = ProjectRootManager.getInstance(project);
+
+        // Get all the source roots in the project
+        VirtualFile[] sourceRoots = manager.getContentSourceRoots();
+
+        // Get the psi manage for active project
+        PsiManager psiManager = PsiManager.getInstance(project);
+
+        for(VirtualFile sourceRoot: sourceRoots){
+            PsiDirectory directory = psiManager.findDirectory(sourceRoot);
+
+            if(directory != null){
+                System.out.println("directory: " + directory.getName());
+                PsiPackage packageDirectory =
+                        JavaDirectoryService.getInstance().getPackage(directory);
+                if(packageDirectory != null){
+                    if(PackageUtil.isPackageDefault(packageDirectory)){
+                        System.out.println("default package");
+                    }
+                    System.out.println("package: " + packageDirectory.getName());
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     private boolean isNameClash(String name, Project project){
+
+        checkPackage(project, "");
 
         // Get the psi manage for active project
         PsiManager psiManager = PsiManager.getInstance(project);

@@ -52,6 +52,7 @@ public class GeneratorToolWindow{
     private JPanel tablesPanel;
     private JScrollPane table1ScrollPane;
     private JScrollPane table2ScrollPane;
+    private JTextField packageField;
 
     private Map<String, Map<String, Object>> designMaps;
     private Map<String, Map<String, String>> toolTipMaps;
@@ -105,6 +106,7 @@ public class GeneratorToolWindow{
         patternComboBox.addActionListener(e -> {
             if(patternComboBox.getSelectedIndex() != -1){
                 String pattern = (String) patternComboBox.getSelectedItem();
+
                 // Update fields in plugin based on design pattern selected
                 updateFields(pattern);
             }
@@ -659,7 +661,7 @@ public class GeneratorToolWindow{
 
         int i = 0;
         for(;i < fields.length && i < fieldTexts.size(); i++){
-            // Set defualt text for field and update visibility
+            // Set default text for field and update visibility
             fields[i].setVisible(true);
             TextField f = (TextField)fields[i];
             f.setDefaultText(fieldTexts.get(i));
@@ -686,6 +688,8 @@ public class GeneratorToolWindow{
 
     private void createUIComponents() {
 
+        logger.info("IN CREATE UI COMPONENTS");
+
         patternComboBox = new ComboBox();
 
         // Set the dimensions of table 1
@@ -701,6 +705,9 @@ public class GeneratorToolWindow{
         classTextField2 = new TextField();
         classTextField3 = new TextField();
         classTextField4 = new TextField();
+
+        // Create text field for packages
+        packageField = new TextField("Package: ");
     }
 
 

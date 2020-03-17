@@ -78,12 +78,12 @@ public class GeneratorToolWindow{
 
 
         // Set the border color and thickness of the table scroll panes
-     //   table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-//        table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         // Set the color of the table headers
-//        table1.getTableHeader().setForeground(Color.DARK_GRAY);
-//        table2.getTableHeader().setForeground(Color.DARK_GRAY);
+        table1.getTableHeader().setForeground(Color.DARK_GRAY);
+        table2.getTableHeader().setForeground(Color.DARK_GRAY);
 
         // Each field becomes element in array (for convenience)
         fields = new JTextField[4];
@@ -153,19 +153,11 @@ public class GeneratorToolWindow{
                         // Get the package name from field
                         String packageName = packageField.getText();
 
-                        // Get virtual directory files for package
-                        Query<VirtualFile> files =
-                                PackageIndex.getInstance(project).getDirsByPackageName(packageName, true);
-
-                        // Get the virtual file for the package
-                        VirtualFile packageFile = files.findFirst();
+                        // Get directory for package
+                        PsiDirectory directory = getDirectory(project, packageName);
 
                         // Check that virtual file exists
-                        if(packageFile != null){
-
-                            // Get directory for package
-                            PsiDirectory directory =
-                                    PsiManager.getInstance(project).findDirectory(packageFile);
+                        if(directory != null){
 
                             // Generate files inside of package
                             generator.generate(project, directory);
@@ -173,10 +165,10 @@ public class GeneratorToolWindow{
                         else{
 
                             // Add package and get psi directory for package
-                            PsiDirectory directory = addPackage(project, packageName);
+                            PsiDirectory newDirectory = addPackage(project, packageName);
 
                             // Generate files inside of new package
-                            generator.generate(project, directory);
+                            generator.generate(project, newDirectory);
                         }
                     }
                 }
@@ -479,6 +471,26 @@ public class GeneratorToolWindow{
         return keys;
     }
 
+
+    private PsiDirectory getDirectory(Project project, String packageName){
+
+        // Get virtual directory files for package
+        Query<VirtualFile> files =
+                PackageIndex.getInstance(project).getDirsByPackageName(packageName, true);
+
+        // Get the virtual file for the package
+        VirtualFile packageFile = files.findFirst();
+
+        // Check that virtual file exists
+        if(packageFile != null){
+
+            // Get directory for package
+            PsiDirectory directory =
+                    PsiManager.getInstance(project).findDirectory(packageFile);
+            return directory;
+        }
+        return null;
+    }
 
     private PsiDirectory addPackage(Project project, String packageName){
 

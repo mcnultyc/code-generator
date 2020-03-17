@@ -369,6 +369,8 @@ public class GeneratorToolWindow{
         addRowButton2.setVisible(false);
 
         GridBagLayout layout = (GridBagLayout) contentPane.getLayout();
+
+        // Get constraints for both tables
         GridBagConstraints table1Constraints = layout.getConstraints(table1ScrollPane);
         GridBagConstraints table2Constraints = layout.getConstraints(table2ScrollPane);
 
@@ -389,13 +391,15 @@ public class GeneratorToolWindow{
             table1ScrollPane.setVisible(true);
             addRowButton1.setVisible(true);
 
+            // Set constraints for button to be centered along entire row
             GridBagConstraints buttonConstraints = layout.getConstraints(addRowButton1);
             buttonConstraints.gridwidth = 2;
             buttonConstraints.anchor = GridBagConstraints.CENTER;
 
+            // Update button constraints with layout manager
             layout.setConstraints(addRowButton1, buttonConstraints);
 
-
+            // Set table constraints to fill entire row
             table1Constraints.gridwidth = 2;
         }
         else if(headerTexts.size() >= 2){
@@ -412,16 +416,20 @@ public class GeneratorToolWindow{
             addRowButton1.setVisible(true);
             addRowButton2.setVisible(true);
 
+            // Set constraints for button to be relocated in one column
             GridBagConstraints buttonConstraints = layout.getConstraints(addRowButton1);
             buttonConstraints.gridwidth = 1;
             buttonConstraints.anchor = GridBagConstraints.CENTER;
 
+            // Update button constraints with layout manager
             layout.setConstraints(addRowButton1, buttonConstraints);
 
+            // Set table constraints to share row
             table1Constraints.gridwidth = 1;
             table2Constraints.gridwidth = 1;
         }
 
+        // Update both tables constraints with layout manager
         layout.setConstraints(table1ScrollPane, table1Constraints);
         layout.setConstraints(table2ScrollPane, table2Constraints);
 
@@ -540,7 +548,6 @@ public class GeneratorToolWindow{
                 return true;
             }
         }
-
         return false;
     }
 

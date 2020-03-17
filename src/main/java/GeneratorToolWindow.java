@@ -553,7 +553,7 @@ public class GeneratorToolWindow{
     }
 
 
-    private boolean validateTable(String packageName, JTable table){
+    private boolean validateTable(String packageName, JTable table, Set<String> classNames){
 
         // Get all user input from table
         List<String> values = getValues(table);
@@ -576,12 +576,29 @@ public class GeneratorToolWindow{
 
                 return false;
             }
+
+            // Check if class name already exists
+            if(classNames.contains(name)){
+
+                // Log error to console
+                logger.error("DUPLICATE CLASS NAME: " + name);
+
+                // Send error notification to user
+                GeneratorErrorsNotifier notifier = new GeneratorErrorsNotifier();
+                notifier.notify(getActiveProject(), "Duplicate class name: "+name);
+                return false;
+            }
+
+            classNames.add(name);
         }
         return true;
     }
 
 
     private boolean validateFields(String pattern){
+
+        // Set to store all class names
+        Set<String> classNames = new HashSet<>();
 
         // Get the number of fields
         int numFields = getFieldKeys(pattern).size();
@@ -591,7 +608,7 @@ public class GeneratorToolWindow{
         // Check that each field is valid
         for(int i = 0; i < numFields; i++){
             String name = fields[i].getText();
-            System.out.println(i + " " + name);
+
             // Check that name is a valid class name
             if(name.equals("") || !isValidClassName(packageName, name)){
 
@@ -601,19 +618,35 @@ public class GeneratorToolWindow{
                 // Send error notification to user
                 GeneratorErrorsNotifier notifier = new GeneratorErrorsNotifier();
                 notifier.notify(getActiveProject(), "Invalid class name: "+name);
-
                 return false;
             }
+
+            // Check if class name already exists
+            if(classNames.contains(name)){
+
+                // Log error to console
+                logger.error("DUPLICATE CLASS NAME: " + name);
+
+                // Send error notification to user
+                GeneratorErrorsNotifier notifier = new GeneratorErrorsNotifier();
+                notifier.notify(getActiveProject(), "Duplicate class name: "+name);
+                return false;
+            }
+
+            // Add class name to set
+            classNames.add(name);
         }
         if(table1.isEnabled()){
+
             // Check that table 1 has valid input
-            if(!validateTable(packageName, table1)){
+            if(!validateTable(packageName, table1, classNames)){
                 return false;
             }
         }
         if(table2.isEnabled()){
+
             // Check that table 2 has valid input
-            if(!validateTable(packageName, table2)){
+            if(!validateTable(packageName, table2, classNames)){
                 return false;
             }
         }
@@ -689,6 +722,9 @@ public class GeneratorToolWindow{
 
     private void updateFields(String pattern){
 
+        // Clear user input from package field
+        ((TextField)packageField).setDefaultText("Package:");
+
         // Get design map for given pattern
         Map<String, Object> designMap = designMaps.get(pattern);
 
@@ -718,8 +754,6 @@ public class GeneratorToolWindow{
             fields[i].setVisible(true);
             TextField f = (TextField)fields[i];
             f.setDefaultText(fieldTexts.get(i));
-
-            fields[i].setForeground(Color.DARK_GRAY);
         }
 
         // Set remaining blank fields as invisible
@@ -740,8 +774,6 @@ public class GeneratorToolWindow{
 
 
     private void createUIComponents() {
-
-        logger.info("IN CREATE UI COMPONENTS");
 
         patternComboBox = new ComboBox();
 

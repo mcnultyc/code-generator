@@ -76,7 +76,6 @@ public class GeneratorToolWindow{
 
         $$$setupUI$$$();
 
-
         // Set the border color and thickness of the table scroll panes
         table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
@@ -91,6 +90,11 @@ public class GeneratorToolWindow{
         fields[1] = classTextField2;
         fields[2] = classTextField3;
         fields[3] = classTextField4;
+
+        // Add tool tip to package field
+        String packageToolTip = "Enter package name. If left blank then default package" +
+                " is chosen. If package doesn't exit then it will be created for you.";
+        packageField.setToolTipText(packageToolTip);
 
         logger.info("CREATING COMPONENT");
 
@@ -596,6 +600,7 @@ public class GeneratorToolWindow{
                 return false;
             }
 
+            // Add class name to collection
             classNames.add(name);
         }
         return true;
@@ -757,6 +762,7 @@ public class GeneratorToolWindow{
 
         int i = 0;
         for(;i < fields.length && i < fieldTexts.size(); i++){
+
             // Set default text for field and update visibility
             fields[i].setVisible(true);
             TextField f = (TextField)fields[i];

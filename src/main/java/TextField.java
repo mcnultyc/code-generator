@@ -34,7 +34,7 @@ public class TextField extends JTextField {
         this.isDefault = true;
         this.defaultText = defaultText;
 
-        setText(defaultText);
+        setDefaultText(defaultText);
 
         addFocusListener(new FocusListener() {
             @Override
@@ -96,7 +96,7 @@ public class TextField extends JTextField {
     @Override
     public String getText() {
         // Default text is just a placeholder
-        if(!isDefault || true){
+        if(!isDefault){
             // Get user inserted text, might also be ""
             return super.getText();
         }

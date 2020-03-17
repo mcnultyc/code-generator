@@ -3,10 +3,16 @@
  */
 
 
+import com.intellij.ide.actions.CreateFileAction;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.projectView.impl.nodes.PackageUtil;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.PackageIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,6 +22,7 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.table.JBTable;
 import com.intellij.psi.*;
+import com.intellij.util.Query;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.typesafe.config.*;
 
@@ -49,7 +56,6 @@ public class GeneratorToolWindow{
     private JButton addRowButton2;
     private JButton generateButton;
 
-    private JPanel tablesPanel;
     private JScrollPane table1ScrollPane;
     private JScrollPane table2ScrollPane;
     private JTextField packageField;
@@ -64,13 +70,16 @@ public class GeneratorToolWindow{
 
     public GeneratorToolWindow(ToolWindow toolWindow) {
 
+        $$$setupUI$$$();
+
+
         // Set the border color and thickness of the table scroll panes
-        table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+     //   table1ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+//        table2ScrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         // Set the color of the table headers
-        table1.getTableHeader().setForeground(Color.DARK_GRAY);
-        table2.getTableHeader().setForeground(Color.DARK_GRAY);
+//        table1.getTableHeader().setForeground(Color.DARK_GRAY);
+//        table2.getTableHeader().setForeground(Color.DARK_GRAY);
 
         // Each field becomes element in array (for convenience)
         fields = new JTextField[4];
@@ -137,10 +146,45 @@ public class GeneratorToolWindow{
                     Project project = getActiveProject();
                     if(project != null){
 
-                        // Get the path to generate file
-                        String path = getSourcePath(project);
-                        // Generate files at given path
-                        generator.generate(path);
+                        String packageName = packageField.getText();
+
+                        // Get virtual directory files for package
+                        Query<VirtualFile> files =
+                                PackageIndex.getInstance(project).getDirsByPackageName(packageName, true);
+
+                        // Get the virtual file for the package
+                        VirtualFile packageFile = files.findFirst();
+
+                        // Check that virtual file exists
+                        if(packageFile != null){
+
+                            PsiDirectory directory =
+                                    PsiManager.getInstance(project).findDirectory(packageFile);
+
+                            System.out.println("dir: " + directory);
+
+                            //PsiFile f = PsiFileFactory.getInstance(project).createFileFromText("Bs.java", JavaFileType.INSTANCE, "class Bs{}");
+
+                            //Runnable r = ()-> directory.add(f);
+
+
+                            // One
+                            //WriteCommandAction.runWriteCommandAction(project, r);
+
+                            generator.generate(project, directory);
+
+
+                            //CreateFileAction fa = new CreateFileAction();
+
+                            //directory.add(f);
+                            // Get the path to generate files
+                            String path = packageFile.getCanonicalPath();
+
+                            System.out.println(path);
+
+                            // Generate files at given path
+                            //generator.generate(path);
+                        }
                     }
                 }
             }
@@ -339,6 +383,10 @@ public class GeneratorToolWindow{
         addRowButton1.setVisible(false);
         addRowButton2.setVisible(false);
 
+        GridBagLayout layout = (GridBagLayout) contentPane.getLayout();
+        GridBagConstraints table1Constraints = layout.getConstraints(table1ScrollPane);
+        GridBagConstraints table2Constraints = layout.getConstraints(table2ScrollPane);
+
         // Make scroll panes and buttons visible selectively
         if(headerTexts.size() == 0){
 
@@ -356,6 +404,14 @@ public class GeneratorToolWindow{
             table1ScrollPane.setVisible(true);
             addRowButton1.setVisible(true);
 
+            GridBagConstraints buttonConstraints = layout.getConstraints(addRowButton1);
+            buttonConstraints.gridwidth = 2;
+            buttonConstraints.anchor = GridBagConstraints.CENTER;
+
+            layout.setConstraints(addRowButton1, buttonConstraints);
+
+
+            table1Constraints.gridwidth = 2;
         }
         else if(headerTexts.size() >= 2){
 
@@ -370,7 +426,19 @@ public class GeneratorToolWindow{
             // Make both tables buttons visible
             addRowButton1.setVisible(true);
             addRowButton2.setVisible(true);
+
+            GridBagConstraints buttonConstraints = layout.getConstraints(addRowButton1);
+            buttonConstraints.gridwidth = 1;
+            buttonConstraints.anchor = GridBagConstraints.CENTER;
+
+            layout.setConstraints(addRowButton1, buttonConstraints);
+
+            table1Constraints.gridwidth = 1;
+            table2Constraints.gridwidth = 1;
         }
+
+        layout.setConstraints(table1ScrollPane, table1Constraints);
+        layout.setConstraints(table2ScrollPane, table2Constraints);
 
         table1.repaint();
         table2.repaint();
@@ -421,6 +489,14 @@ public class GeneratorToolWindow{
 
     private boolean checkPackage(Project project, String packageName){
 
+        PsiPackage psi =
+        JavaPsiFacade.getInstance(project).findPackage(packageName);
+
+        PsiClass[] myClasses = psi.getClasses();
+        for(PsiClass myClass: myClasses){
+            System.out.println(myClass);
+        }
+
         // TODO
 
         // Get the project manager
@@ -432,77 +508,76 @@ public class GeneratorToolWindow{
         // Get the psi manage for active project
         PsiManager psiManager = PsiManager.getInstance(project);
 
+
+
         for(VirtualFile sourceRoot: sourceRoots){
             PsiDirectory directory = psiManager.findDirectory(sourceRoot);
 
             if(directory != null){
-                System.out.println("directory: " + directory.getName());
+                System.out.println("source directory: " + directory.getName());
                 PsiPackage packageDirectory =
                         JavaDirectoryService.getInstance().getPackage(directory);
-                if(packageDirectory != null){
+                final PsiDirectory[] subdirectories = directory.getSubdirectories();
+                System.out.println("# subdirectories: " + subdirectories.length);
+                for (PsiDirectory subdirectory : subdirectories) {
+                    final PsiPackage aPackage = JavaDirectoryService.getInstance().getPackage(subdirectory);
+                    if (aPackage != null && !PackageUtil.isPackageDefault(aPackage)) {
+                        System.out.println("package name: " + aPackage.getName());
+                    }
+                }
+                if(packageDirectory != null || PackageUtil.isPackageDefault(packageDirectory)){
                     if(PackageUtil.isPackageDefault(packageDirectory)){
                         System.out.println("default package");
                     }
                     System.out.println("package: " + packageDirectory.getName());
                 }
-            }
-        }
+                else{
 
-        return false;
-    }
-
-
-    private boolean isNameClash(String name, Project project){
-
-        checkPackage(project, "");
-
-        // Get the psi manage for active project
-        PsiManager psiManager = PsiManager.getInstance(project);
-
-        // Get all virtual files for active project
-        Collection<VirtualFile> files =
-        FileBasedIndex.getInstance()
-                .getContainingFiles(
-                        FileTypeIndex.NAME,
-                        JavaFileType.INSTANCE,
-                        GlobalSearchScope.projectScope(project));
-
-        // Search every file in the project
-        for(VirtualFile file: files){
-            PsiFile psiFile = psiManager.findFile(file);
-
-            // Check if file is java file (should be)
-            if(psiFile instanceof PsiJavaFile){
-                PsiJavaFile javaFile = (PsiJavaFile) psiFile;
-
-                // Check if file is in default package
-                if(javaFile.getPackageName().equals("")){
-
-                    // Get all classes in current file
-                    PsiClass[] psiClasses = javaFile.getClasses();
-
-                    // Look for name clash with all classes in file
-                    for(PsiClass psiClass: psiClasses){
-                        if(name.equals(psiClass.getName())){
-                            return true;
-                        }
-                    }
                 }
             }
         }
+
         return false;
     }
 
-    private boolean isValidClassName(String name){
+
+    private boolean isNameClash(String packageName, String name, Project project){
+
+        System.out.println("checking name clash!!!!!");
+
+        // Get the psi package for this project
+        PsiPackage psiPackage =
+                JavaPsiFacade.getInstance(project).findPackage(packageName);
+
+        // Get all the of the classes inside of chosen package
+        PsiClass[] psiClasses = psiPackage.getClasses();
+
+        System.out.println("# classes: " + psiClasses.length);
+
+        // Check for name clash against all classes in package
+        for(PsiClass psiClass: psiClasses){
+
+            System.err.println(psiClass.getContainingFile().getVirtualFile().getPath());
+
+            // Check if names are the same
+            if(name.equals(psiClass.getName())){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isValidClassName(String packageName, String name){
 
         // Check that name is not a keyword and is a valid class name
         return !SourceVersion.isKeyword(name)
                     && SourceVersion.isName(name)
-                        && !isNameClash(name, getActiveProject());
+                        && !isNameClash(packageName, name, getActiveProject());
     }
 
 
-    private boolean validateTable(JTable table){
+    private boolean validateTable(String packageName, JTable table){
 
         // Get all user input from table
         List<String> values = getValues(table);
@@ -514,7 +589,7 @@ public class GeneratorToolWindow{
 
         // Check that each name is table is valid
         for(String name: values){
-            if(!isValidClassName(name)){
+            if(!isValidClassName(packageName, name)){
 
                 // Log error to console
                 logger.error("INVALID CLASS NAME IN TABLE: "+name);
@@ -535,12 +610,14 @@ public class GeneratorToolWindow{
         // Get the number of fields
         int numFields = getFieldKeys(pattern).size();
 
+        String packageName = packageField.getText();
+
         // Check that each field is valid
         for(int i = 0; i < numFields; i++){
             String name = fields[i].getText();
-
+            System.out.println(i + " " + name);
             // Check that name is a valid class name
-            if(name.equals("") || !isValidClassName(name)){
+            if(name.equals("") || !isValidClassName(packageName, name)){
 
                 // Log error to console
                 logger.error("INVALID CLASS NAME: "+name);
@@ -554,13 +631,13 @@ public class GeneratorToolWindow{
         }
         if(table1.isEnabled()){
             // Check that table 1 has valid input
-            if(!validateTable(table1)){
+            if(!validateTable(packageName, table1)){
                 return false;
             }
         }
         if(table2.isEnabled()){
             // Check that table 2 has valid input
-            if(!validateTable(table2)){
+            if(!validateTable(packageName, table2)){
                 return false;
             }
         }
@@ -713,5 +790,10 @@ public class GeneratorToolWindow{
 
     public JPanel getContent() {
         return contentPane;
+    }
+
+
+    private void $$$setupUI$$$() {
+        createUIComponents();
     }
 }

@@ -17,6 +17,12 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,6 +260,49 @@ public abstract class DesignPatternGenerator {
 
     protected abstract void build();
 
+
+    private void addPsiFiles(PsiDirectory directory){
+
+    }
+
+
+    public ArrayList<CompilationUnit> generate(Project project, PsiDirectory directory){
+
+        // Check if the compilation units have been created yet
+        if(compilationUnits.size() == 0){
+            // Build the compilation units
+            build();
+        }
+
+        logger.info("STORING COMPILATION UNITS TO PACKAGE: " + directory.getName());
+
+        PsiFileFactory fileFactory = PsiFileFactory.getInstance(project);
+
+        // Create runnable to be executed later by the command processor
+        Runnable runnable = () -> {
+            for (CompilationUnit compilationUnit : compilationUnits) {
+
+                // Get name of compilation unit type
+                String type = compilationUnit.getType(0).getNameAsString();
+                String filename = type + ".java";
+
+                // Intellij only \n for line separators and will throw exception
+                String text = compilationUnit.toString().replaceAll("\r\n", "\n");
+
+                // Create psi file for compilation unit
+                PsiFile psiFile =
+                        fileFactory.createFileFromText(filename, JavaFileType.INSTANCE, text);
+
+                // Add psi file to directory
+                directory.add(psiFile);
+            }
+        };
+
+        // Execute write command
+        WriteCommandAction.runWriteCommandAction(project, runnable);
+
+        return compilationUnits;
+    }
 
     /**
      * Stores the compilation units created by this design pattern in

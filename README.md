@@ -105,6 +105,9 @@ You can also see this error logged to the console.
 
 ![error](images/error.png)
 
+## Generating files in a package
+![package](images/create-package.png)
+
 # Homework 3
 ### Description: object-oriented design and implementation of the name clashing functionality in the IntelliJ plugin with the design pattern code generator from homeworks 1 and 2.
 ### Grade: 8% + bonus up to 3% for using a Java parser (it can be Eclipse AST parser or the module [jdk.compiler](https://docs.oracle.com/en/java/javase/13/docs/api/jdk.compiler/module-summary.html)).

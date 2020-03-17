@@ -146,33 +146,45 @@ public class GeneratorToolWindow{
                 // Create config from design map of respective pattern
                 Config config = ConfigFactory.parseMap(designMap);
 
-                // Create design pattern generator based on config
-                DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
-                if(generator != null){
+                // Get the currently open project
+                Project project = getActiveProject();
+                if(project != null){
 
-                    // Get the currently open project
-                    Project project = getActiveProject();
-                    if(project != null){
+                    // Get the package name from field
+                    String packageName = packageField.getText();
 
-                        // Get the package name from field
-                        String packageName = packageField.getText();
+                    // Get directory for package
+                    PsiDirectory directory = getDirectory(project, packageName);
 
-                        // Get directory for package
-                        PsiDirectory directory = getDirectory(project, packageName);
+                    // Check that virtual file exists
+                    if(directory != null){
 
-                        // Check that virtual file exists
-                        if(directory != null){
+                        // Create design pattern generator based on config
+                        DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
+                        if(generator != null){
 
                             // Generate files inside of package
                             generator.generate(project, directory);
                         }
+                    }
+                    else{
+
+                        // Add package and get psi directory for package
+                        PsiDirectory newDirectory = addPackage(project, packageName);
+
+                        // Check if package directory was created (user could reject)
+                        if(newDirectory != null){
+
+                            // Create design pattern generator based on config
+                            DesignPatternGenerator generator = DesignPatternGenFactory.create(config);
+                            if(generator != null){
+
+                                // Generate files inside of new package
+                                generator.generate(project, newDirectory);
+                            }
+                        }
                         else{
-
-                            // Add package and get psi directory for package
-                            PsiDirectory newDirectory = addPackage(project, packageName);
-
-                            // Generate files inside of new package
-                            generator.generate(project, newDirectory);
+                            logger.info("PACKAGE NOT CREATED");
                         }
                     }
                 }
@@ -506,7 +518,7 @@ public class GeneratorToolWindow{
 
     private PsiDirectory addPackage(Project project, String packageName){
 
-        logger.info("CREATING PACKAGE: " + packageName);
+        logger.info("ATTEMPTING TO CREATE PACKAGE: " + packageName);
 
         // Get the project manager
         ProjectRootManager manager = ProjectRootManager.getInstance(project);

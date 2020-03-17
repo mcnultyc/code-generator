@@ -10,6 +10,9 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.PackageIndex;
@@ -18,6 +21,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.psi.impl.file.PsiDirectoryFactory;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.table.JBTable;
@@ -146,6 +150,7 @@ public class GeneratorToolWindow{
                     Project project = getActiveProject();
                     if(project != null){
 
+                        // Get the package name from field
                         String packageName = packageField.getText();
 
                         // Get virtual directory files for package
@@ -158,32 +163,20 @@ public class GeneratorToolWindow{
                         // Check that virtual file exists
                         if(packageFile != null){
 
+                            // Get directory for package
                             PsiDirectory directory =
                                     PsiManager.getInstance(project).findDirectory(packageFile);
 
-                            System.out.println("dir: " + directory);
-
-                            //PsiFile f = PsiFileFactory.getInstance(project).createFileFromText("Bs.java", JavaFileType.INSTANCE, "class Bs{}");
-
-                            //Runnable r = ()-> directory.add(f);
-
-
-                            // One
-                            //WriteCommandAction.runWriteCommandAction(project, r);
-
+                            // Generate files inside of package
                             generator.generate(project, directory);
+                        }
+                        else{
 
+                            // Add package and get psi directory for package
+                            PsiDirectory directory = addPackage(project, packageName);
 
-                            //CreateFileAction fa = new CreateFileAction();
-
-                            //directory.add(f);
-                            // Get the path to generate files
-                            String path = packageFile.getCanonicalPath();
-
-                            System.out.println(path);
-
-                            // Generate files at given path
-                            //generator.generate(path);
+                            // Generate files inside of new package
+                            generator.generate(project, directory);
                         }
                     }
                 }
@@ -487,17 +480,9 @@ public class GeneratorToolWindow{
     }
 
 
-    private boolean checkPackage(Project project, String packageName){
+    private PsiDirectory addPackage(Project project, String packageName){
 
-        PsiPackage psi =
-        JavaPsiFacade.getInstance(project).findPackage(packageName);
-
-        PsiClass[] myClasses = psi.getClasses();
-        for(PsiClass myClass: myClasses){
-            System.out.println(myClass);
-        }
-
-        // TODO
+        logger.info("CREATING PACKAGE: " + packageName);
 
         // Get the project manager
         ProjectRootManager manager = ProjectRootManager.getInstance(project);
@@ -505,59 +490,38 @@ public class GeneratorToolWindow{
         // Get all the source roots in the project
         VirtualFile[] sourceRoots = manager.getContentSourceRoots();
 
-        // Get the psi manage for active project
+        // Get the module for the first source root found
+        Module module =
+                ModuleUtil.findModuleForFile(sourceRoots[0], project);
+
+        // Get the psi manager
         PsiManager psiManager = PsiManager.getInstance(project);
 
+        // Find the psi directory for selected source root
+        PsiDirectory directory = psiManager.findDirectory(sourceRoots[0]);
 
-
-        for(VirtualFile sourceRoot: sourceRoots){
-            PsiDirectory directory = psiManager.findDirectory(sourceRoot);
-
-            if(directory != null){
-                System.out.println("source directory: " + directory.getName());
-                PsiPackage packageDirectory =
-                        JavaDirectoryService.getInstance().getPackage(directory);
-                final PsiDirectory[] subdirectories = directory.getSubdirectories();
-                System.out.println("# subdirectories: " + subdirectories.length);
-                for (PsiDirectory subdirectory : subdirectories) {
-                    final PsiPackage aPackage = JavaDirectoryService.getInstance().getPackage(subdirectory);
-                    if (aPackage != null && !PackageUtil.isPackageDefault(aPackage)) {
-                        System.out.println("package name: " + aPackage.getName());
-                    }
-                }
-                if(packageDirectory != null || PackageUtil.isPackageDefault(packageDirectory)){
-                    if(PackageUtil.isPackageDefault(packageDirectory)){
-                        System.out.println("default package");
-                    }
-                    System.out.println("package: " + packageDirectory.getName());
-                }
-                else{
-
-                }
-            }
-        }
-
-        return false;
+        // Ask user to add package and resolve conflicts
+        return com.intellij.ide.util.PackageUtil
+                .findOrCreateDirectoryForPackage(module, packageName, directory, true);
     }
 
 
     private boolean isNameClash(String packageName, String name, Project project){
 
-        System.out.println("checking name clash!!!!!");
-
         // Get the psi package for this project
         PsiPackage psiPackage =
                 JavaPsiFacade.getInstance(project).findPackage(packageName);
 
+        // Check if package exists
+        if(psiPackage == null){
+            return false;
+        }
+
         // Get all the of the classes inside of chosen package
         PsiClass[] psiClasses = psiPackage.getClasses();
 
-        System.out.println("# classes: " + psiClasses.length);
-
         // Check for name clash against all classes in package
         for(PsiClass psiClass: psiClasses){
-
-            System.err.println(psiClass.getContainingFile().getVirtualFile().getPath());
 
             // Check if names are the same
             if(name.equals(psiClass.getName())){

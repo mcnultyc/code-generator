@@ -304,6 +304,7 @@ public abstract class DesignPatternGenerator {
         return compilationUnits;
     }
 
+
     /**
      * Stores the compilation units created by this design pattern in
      * the path provided.

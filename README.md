@@ -106,7 +106,32 @@ You can also see this error logged to the console.
 ![error](images/error.png)
 
 ## Generating files in a package
+
+### Package input
+
+Users can enter a package name and the files will be
+generated inside of the provided package. If the package
+doesn't exist then the user is prompted if they would
+like the plugin to create the package before generating the files.
+If no package input is provided then files are generated in the default
+package.
+
 ![package](images/create-package.png)
+
+### Name clash
+
+If one of the classes entered has a name clash with
+the package provided then the plugin notifies the
+user about that error. There is also an error logged to
+the terminal that you can inspect. I was able to accomplish this using
+the intellij sdk's virtual files and psi to extract all 
+of the classes inside all of the files in a given package.
+There's a method inside of [GeneratorToolWindow](src/main/java/GeneratorToolWindow.java)
+named `isNameClash` that provides the logic to look for name
+clashes.
+
+![clash](images/name-clash.png)
+
 
 # Homework 3
 ### Description: object-oriented design and implementation of the name clashing functionality in the IntelliJ plugin with the design pattern code generator from homeworks 1 and 2.

@@ -1,4 +1,4 @@
-# Homework 3
+# IntelliJ Code Generator
 
 ## Build process
 
